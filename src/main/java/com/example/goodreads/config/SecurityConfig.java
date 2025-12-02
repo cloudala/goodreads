@@ -20,13 +20,16 @@ public class SecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final AuthEntryPointJwt unauthorizedHandler;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
     public SecurityConfig(CustomUserDetailsService customUserDetailsService,
                           JwtAuthenticationFilter jwtAuthenticationFilter,
-                          AuthEntryPointJwt unauthorizedHandler) {
+                          AuthEntryPointJwt unauthorizedHandler,
+                          CustomAccessDeniedHandler customAccessDeniedHandler) {
         this.customUserDetailsService = customUserDetailsService;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.unauthorizedHandler = unauthorizedHandler;
+        this.customAccessDeniedHandler = customAccessDeniedHandler;
     }
 
     @Bean
@@ -43,7 +46,11 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .exceptionHandling(e -> e.authenticationEntryPoint(unauthorizedHandler))
+                .exceptionHandling(e ->
+                        e
+                        .authenticationEntryPoint(unauthorizedHandler)
+                        .accessDeniedHandler(customAccessDeniedHandler)
+                )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/api/auth/**").permitAll()

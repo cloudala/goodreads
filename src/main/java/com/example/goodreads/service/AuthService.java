@@ -5,6 +5,7 @@ import com.example.goodreads.dto.LoginResponse;
 import com.example.goodreads.dto.RegisterRequest;
 import com.example.goodreads.dto.RegisterResponse;
 import com.example.goodreads.exception.UsernameAlreadyExistsException;
+import com.example.goodreads.model.Role;
 import com.example.goodreads.model.User;
 import com.example.goodreads.repository.UserRepository;
 import com.example.goodreads.util.JwtUtil;
@@ -38,6 +39,7 @@ public class AuthService {
         user.setUsername(registerRequest.getUsername());
         user.setEmail(registerRequest.getEmail());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+        user.setRole(Role.USER);
         userRepository.save(user);
 
         return new RegisterResponse(

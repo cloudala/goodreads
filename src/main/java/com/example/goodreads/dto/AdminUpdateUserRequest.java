@@ -1,43 +1,20 @@
-package com.example.goodreads.model;
+package com.example.goodreads.dto;
 
-import jakarta.persistence.*;
+import com.example.goodreads.model.Role;
 
-@Entity
-@Table(name = "users")
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(unique = true, nullable = false)
+public class AdminUpdateUserRequest {
     private String username;
-
-    @Column(unique = true, nullable = false)
     private String email;
-
-    @Column(nullable = false)
     private String password;
+    private Role role;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role = Role.USER;
+    public AdminUpdateUserRequest() {}
 
-    public User(Long id, String username, String email, String password) {
-        this.id = id;
+    public AdminUpdateUserRequest(String username, String email, String password, Role role) {
         this.username = username;
         this.email = email;
         this.password = password;
-    }
-
-    public User() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+        this.role = role;
     }
 
     public String getUsername() {
