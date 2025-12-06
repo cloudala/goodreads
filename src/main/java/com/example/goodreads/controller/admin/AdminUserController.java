@@ -1,8 +1,8 @@
 package com.example.goodreads.controller.admin;
 
-import com.example.goodreads.dto.AdminCreateUserRequest;
-import com.example.goodreads.dto.AdminUpdateUserRequest;
-import com.example.goodreads.dto.AdminUserResponse;
+import com.example.goodreads.dto.admin.user.AdminCreateUserRequest;
+import com.example.goodreads.dto.admin.user.AdminUpdateUserRequest;
+import com.example.goodreads.dto.admin.user.AdminUserResponse;
 import com.example.goodreads.service.admin.AdminUserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/users")
-// PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminUserController {
     private final AdminUserService adminUserService;
 

@@ -1,15 +1,13 @@
-package com.example.goodreads.dto;
+package com.example.goodreads.dto.user;
 
-public class RegisterRequest {
+public class UpdateUserResponse {
     private String username;
-    private String password;
     private String email;
 
-    public RegisterRequest() {}
+    public UpdateUserResponse() {}
 
-    public RegisterRequest(String username, String password, String email) {
+    public UpdateUserResponse(String username, String email) {
         this.username = username;
-        this.password = password;
         this.email = email;
     }
 
@@ -19,14 +17,6 @@ public class RegisterRequest {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getEmail() {

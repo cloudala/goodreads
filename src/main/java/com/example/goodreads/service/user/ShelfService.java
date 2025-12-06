@@ -1,0 +1,79 @@
+package com.example.goodreads.service.user;
+
+import com.example.goodreads.dto.book.BookResponse;
+import com.example.goodreads.dto.shelf.ShelfDetailsResponse;
+import com.example.goodreads.dto.shelf.ShelfRequest;
+import com.example.goodreads.dto.shelf.ShelfResponse;
+import com.example.goodreads.exception.ShelfNotFoundException;
+import com.example.goodreads.model.Shelf;
+import com.example.goodreads.model.User;
+import com.example.goodreads.repository.ShelfRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+public class ShelfService {
+    private final ShelfRepository shelfRepository;
+    private final UserService userService;
+
+    public ShelfService(ShelfRepository shelfRepository, UserService userService) {
+        this.shelfRepository = shelfRepository;
+        this.userService = userService;
+    }
+
+    public List<ShelfResponse> getUserShelves(String username) {
+        User user = userService.getCurrentUser(username);
+        return shelfRepository.findByUserId(user.getId())
+                .stream()
+                .map(shelf -> new ShelfResponse(shelf.getId(), shelf.getName()))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public ShelfDetailsResponse getShelfById(String username, Long shelfId) {
+        User user = userService.getCurrentUser(username);
+
+        Shelf shelf = shelfRepository.findByIdAndUserId(shelfId, user.getId())
+                .orElseThrow(() -> new ShelfNotFoundException("Shelf not found"));
+
+        List<BookResponse> bookResponses = shelf.getBooks().stream()
+                .map(book -> new BookResponse(
+                        book.getId(),
+                        book.getTitle(),
+                        book.getAuthor()
+                ))
+                .toList();
+
+        return new ShelfDetailsResponse(shelf.getId(), shelf.getName(), bookResponses);
+    }
+
+    public ShelfResponse addShelfToUser(String username, ShelfRequest shelfRequest) {
+        User user = userService.getCurrentUser(username);
+        Shelf shelf = new Shelf(shelfRequest.getName());
+        shelf.setUser(user);
+        Shelf savedShelf = shelfRepository.save(shelf);
+        return new ShelfResponse(savedShelf.getId(), savedShelf.getName());
+    }
+
+    public ShelfResponse updateUserShelf(String username, Long shelfId, ShelfRequest request) {
+        User user = userService.getCurrentUser(username);
+        Shelf shelf = shelfRepository.findByIdAndUserId(shelfId, user.getId())
+                .orElseThrow(() -> new ShelfNotFoundException("Shelf not found"));
+
+        shelf.setName(request.getName());
+        Shelf updated = shelfRepository.save(shelf);
+
+        return new ShelfResponse(updated.getId(), updated.getName());
+    }
+
+    public void deleteUserShelf(String username, Long shelfId) {
+        User user = userService.getCurrentUser(username);
+        Shelf shelf = shelfRepository.findByIdAndUserId(shelfId, user.getId())
+                .orElseThrow(() -> new ShelfNotFoundException("Shelf not found"));
+        shelfRepository.delete(shelf);
+    }
+
+
+}

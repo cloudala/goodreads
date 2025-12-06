@@ -1,4 +1,4 @@
-package com.example.goodreads.dto;
+package com.example.goodreads.dto.admin.user;
 
 import com.example.goodreads.model.Role;
 

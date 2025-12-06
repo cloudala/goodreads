@@ -1,9 +1,9 @@
 package com.example.goodreads.service;
 
-import com.example.goodreads.dto.LoginRequest;
-import com.example.goodreads.dto.LoginResponse;
-import com.example.goodreads.dto.RegisterRequest;
-import com.example.goodreads.dto.RegisterResponse;
+import com.example.goodreads.dto.auth.LoginRequest;
+import com.example.goodreads.dto.auth.LoginResponse;
+import com.example.goodreads.dto.auth.RegisterRequest;
+import com.example.goodreads.dto.auth.RegisterResponse;
 import com.example.goodreads.exception.UsernameAlreadyExistsException;
 import com.example.goodreads.model.Role;
 import com.example.goodreads.model.User;

@@ -1,4 +1,4 @@
-package com.example.goodreads.dto;
+package com.example.goodreads.dto.user;
 
 public class UpdateUserRequest {
     private String username;

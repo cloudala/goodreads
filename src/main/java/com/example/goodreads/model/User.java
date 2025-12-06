@@ -2,6 +2,9 @@ package com.example.goodreads.model;
 
 import jakarta.persistence.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "users")
 public class User {
@@ -21,6 +24,14 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role = Role.USER;
+
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    private Set<Shelf> shelves = new HashSet<>();
 
     public User(Long id, String username, String email, String password) {
         this.id = id;
@@ -70,5 +81,24 @@ public class User {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public Set<Shelf> getShelves() {
+        return shelves;
+    }
+
+    public void setShelves(Set<Shelf> shelves) {
+        this.shelves = shelves;
+    }
+
+    // -------- Helper methods --------
+    public void addShelf(Shelf shelf) {
+        shelves.add(shelf);
+        shelf.setUser(this);
+    }
+
+    public void removeShelf(Shelf shelf) {
+        shelves.remove(shelf);
+        shelf.setUser(null);
     }
 }

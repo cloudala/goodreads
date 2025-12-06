@@ -1,7 +1,7 @@
 package com.example.goodreads.controller.user;
 
-import com.example.goodreads.dto.UpdateUserRequest;
-import com.example.goodreads.dto.UpdateUserResponse;
+import com.example.goodreads.dto.user.UpdateUserRequest;
+import com.example.goodreads.dto.user.UpdateUserResponse;
 import com.example.goodreads.service.user.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

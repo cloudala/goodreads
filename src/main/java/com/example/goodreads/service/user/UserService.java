@@ -1,7 +1,7 @@
 package com.example.goodreads.service.user;
 
-import com.example.goodreads.dto.UpdateUserRequest;
-import com.example.goodreads.dto.UpdateUserResponse;
+import com.example.goodreads.dto.user.UpdateUserRequest;
+import com.example.goodreads.dto.user.UpdateUserResponse;
 import com.example.goodreads.exception.UsernameNotFoundException;
 import com.example.goodreads.model.User;
 import com.example.goodreads.repository.UserRepository;

@@ -1,8 +1,8 @@
 package com.example.goodreads.service.admin;
 
-import com.example.goodreads.dto.AdminCreateUserRequest;
-import com.example.goodreads.dto.AdminUpdateUserRequest;
-import com.example.goodreads.dto.AdminUserResponse;
+import com.example.goodreads.dto.admin.user.AdminCreateUserRequest;
+import com.example.goodreads.dto.admin.user.AdminUpdateUserRequest;
+import com.example.goodreads.dto.admin.user.AdminUserResponse;
 import com.example.goodreads.exception.UsernameAlreadyExistsException;
 import com.example.goodreads.exception.UsernameNotFoundException;
 import com.example.goodreads.model.User;

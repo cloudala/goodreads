@@ -1,4 +1,4 @@
-package com.example.goodreads.dto;
+package com.example.goodreads.dto.auth;
 
 public class LoginResponse {
     private String token;
