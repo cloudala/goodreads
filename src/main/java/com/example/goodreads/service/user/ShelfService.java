@@ -4,9 +4,13 @@ import com.example.goodreads.dto.book.BookResponse;
 import com.example.goodreads.dto.shelf.ShelfDetailsResponse;
 import com.example.goodreads.dto.shelf.ShelfRequest;
 import com.example.goodreads.dto.shelf.ShelfResponse;
+import com.example.goodreads.exception.BookNotFoundException;
 import com.example.goodreads.exception.ShelfNotFoundException;
+import com.example.goodreads.model.Book;
 import com.example.goodreads.model.Shelf;
+import com.example.goodreads.model.ShelfType;
 import com.example.goodreads.model.User;
+import com.example.goodreads.repository.BookRepository;
 import com.example.goodreads.repository.ShelfRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,11 +20,28 @@ import java.util.List;
 @Service
 public class ShelfService {
     private final ShelfRepository shelfRepository;
+    private final BookRepository bookRepository;
     private final UserService userService;
 
-    public ShelfService(ShelfRepository shelfRepository, UserService userService) {
+    public ShelfService(ShelfRepository shelfRepository, BookRepository bookRepository, UserService userService) {
         this.shelfRepository = shelfRepository;
+        this.bookRepository = bookRepository;
         this.userService = userService;
+    }
+
+    public void createDefaultShelves(User user) {
+        Shelf read = new Shelf("Read");
+        read.setType(ShelfType.READ);
+
+        Shelf currently = new Shelf("Currently Reading");
+        currently.setType(ShelfType.CURRENTLY_READING);
+
+        Shelf want = new Shelf("Want to Read");
+        want.setType(ShelfType.WANT_TO_READ);
+
+        user.addShelf(read);
+        user.addShelf(currently);
+        user.addShelf(want);
     }
 
     public List<ShelfResponse> getUserShelves(String username) {
@@ -62,6 +83,10 @@ public class ShelfService {
         Shelf shelf = shelfRepository.findByIdAndUserId(shelfId, user.getId())
                 .orElseThrow(() -> new ShelfNotFoundException("Shelf not found"));
 
+        if (shelf.getType() != ShelfType.CUSTOM) {
+            throw new IllegalArgumentException("Cannot update built-in shelf");
+        }
+
         shelf.setName(request.getName());
         Shelf updated = shelfRepository.save(shelf);
 
@@ -72,8 +97,32 @@ public class ShelfService {
         User user = userService.getCurrentUser(username);
         Shelf shelf = shelfRepository.findByIdAndUserId(shelfId, user.getId())
                 .orElseThrow(() -> new ShelfNotFoundException("Shelf not found"));
+        if (shelf.getType() != ShelfType.CUSTOM) {
+            throw new IllegalArgumentException("Cannot delete built-in shelf");
+        }
         shelfRepository.delete(shelf);
     }
 
+    @Transactional
+    public void addBookToShelf(String username, Long shelfId, Long bookId) {
+        User user = userService.getCurrentUser(username);
+        Shelf shelf = shelfRepository.findByIdAndUserId(shelfId, user.getId())
+                .orElseThrow(() -> new ShelfNotFoundException("Shelf with id " + shelfId + " not found"));
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new BookNotFoundException("Book with id " + bookId + " not found"));
+        shelf.addBook(book);
+        shelfRepository.save(shelf);
+    }
+
+    @Transactional
+    public void removeBookFromShelf(String username, Long shelfId, Long bookId) {
+        User user = userService.getCurrentUser(username);
+        Shelf shelf = shelfRepository.findByIdAndUserId(shelfId, user.getId())
+                .orElseThrow(() -> new ShelfNotFoundException("Shelf with id " + shelfId + " not found"));
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new BookNotFoundException("Book with id " + bookId + " not found"));
+        shelf.removeBook(book);
+        shelfRepository.save(shelf);
+    }
 
 }

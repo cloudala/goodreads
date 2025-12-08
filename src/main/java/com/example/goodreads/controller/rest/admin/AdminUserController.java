@@ -1,4 +1,4 @@
-package com.example.goodreads.controller.admin;
+package com.example.goodreads.controller.rest.admin;
 
 import com.example.goodreads.dto.admin.user.AdminCreateUserRequest;
 import com.example.goodreads.dto.admin.user.AdminUpdateUserRequest;

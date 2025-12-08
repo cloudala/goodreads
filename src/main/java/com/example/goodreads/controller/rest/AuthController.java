@@ -1,4 +1,4 @@
-package com.example.goodreads.controller;
+package com.example.goodreads.controller.rest;
 
 import com.example.goodreads.dto.auth.LoginRequest;
 import com.example.goodreads.dto.auth.LoginResponse;

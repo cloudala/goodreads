@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+
+<head>
+    <title>GoodReads Home</title>
+</head>
+
+<body>
+
+<section layout:fragment="content">
+
+    <!-- Welcome Section -->
+    <div class="text-center mb-5">
+        <h1 class="fw-bold">Welcome to GoodReads</h1>
+        <p class="lead text-muted">Discover, track, and manage your favorite books all in one place.</p>
+        <a class="btn btn-primary btn-lg mt-3" th:href="@{/books}">Browse Books</a>
+    </div>
+
+    <!-- Featured Books Section -->
+    <div class="mb-5">
+        <h2 class="fw-bold mb-4">Featured Books</h2>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+
+            <div class="col" th:each="book : ${featuredBooks}">
+                <div class="card h-100 shadow-sm">
+<!--                    <img th:src="@{${book.coverUrl}}" class="card-img-top" alt="Book cover">-->
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${book.title}"></h5>
+                        <p class="card-text text-muted" th:text="${book.author}"></p>
+                    </div>
+                    <div class="card-footer bg-transparent border-top-0">
+                        <a class="btn btn-outline-primary w-100" th:href="@{/books/{id}(id=${book.id})}">View Details</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Recently Added Books Section -->
+    <div class="mb-5">
+        <h2 class="fw-bold mb-4">Recently Added</h2>
+        <div class="row row-cols-1 row-cols-md-4 g-3">
+
+            <div class="col" th:each="book : ${recentBooks}">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <h6 class="card-title mb-1" th:text="${book.title}"></h6>
+                        <small class="text-muted" th:text="${book.author}"></small>
+                        <p class="mt-2 mb-0 small text-muted" th:text="${book.publicationYear}"></p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Call-to-Action Section -->
+    <div class="text-center py-5 bg-light rounded shadow-sm">
+        <h3 class="fw-bold mb-3">Join Our Community</h3>
+        <p class="text-muted mb-4">Sign up today to track your books and share reviews with other readers.</p>
+        <a class="btn btn-success btn-lg" th:href="@{/register}">Sign Up</a>
+    </div>
+
+</section>
+
+</body>
+</html>

@@ -1,4 +1,4 @@
-package com.example.goodreads.controller.user;
+package com.example.goodreads.controller.rest.user;
 
 import com.example.goodreads.dto.user.UpdateUserRequest;
 import com.example.goodreads.dto.user.UpdateUserResponse;

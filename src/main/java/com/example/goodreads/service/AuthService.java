@@ -8,6 +8,7 @@ import com.example.goodreads.exception.UsernameAlreadyExistsException;
 import com.example.goodreads.model.Role;
 import com.example.goodreads.model.User;
 import com.example.goodreads.repository.UserRepository;
+import com.example.goodreads.service.user.ShelfService;
 import com.example.goodreads.util.JwtUtil;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,12 +23,15 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
+    private final ShelfService shelfService;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtUtil jwtUtil) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtUtil jwtUtil,
+                       ShelfService shelfService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
+        this.shelfService = shelfService;
     }
 
     public RegisterResponse register(RegisterRequest registerRequest) {
@@ -40,6 +44,9 @@ public class AuthService {
         user.setEmail(registerRequest.getEmail());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setRole(Role.USER);
+        userRepository.save(user);
+
+        shelfService.createDefaultShelves(user);
         userRepository.save(user);
 
         return new RegisterResponse(

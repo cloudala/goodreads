@@ -15,6 +15,11 @@ public class Shelf {
     @Column(nullable = false)
     private String name;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ShelfType type = ShelfType.CUSTOM;
+
+
     // ------------ USER RELATION ------------
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
@@ -49,6 +54,14 @@ public class Shelf {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public ShelfType getType() {
+        return type;
+    }
+
+    public void setType(ShelfType type) {
+        this.type = type;
     }
 
     public User getUser() {

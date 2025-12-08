@@ -5,9 +5,11 @@ import com.example.goodreads.dto.admin.book.AdminCreateBookRequest;
 import com.example.goodreads.dto.admin.book.AdminUpdateBookRequest;
 import com.example.goodreads.exception.BookNotFoundException;
 import com.example.goodreads.model.Book;
+import com.example.goodreads.model.Shelf;
 import com.example.goodreads.repository.BookRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -78,6 +80,13 @@ public class AdminBookService {
 
     public void deleteBook(Long id) {
         Book book = getBookByIdInternal(id);
+
+        // Remove book from all shelves before deletion
+        for (Shelf shelf : new HashSet<>(book.getShelves())) {
+            shelf.getBooks().remove(book);
+            book.getShelves().remove(shelf);
+        }
+
         bookRepository.delete(book);
     }
 }

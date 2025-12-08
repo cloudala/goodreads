@@ -1,4 +1,4 @@
-package com.example.goodreads.config;
+package com.example.goodreads.config.init;
 
 import com.example.goodreads.model.Role;
 import com.example.goodreads.model.User;

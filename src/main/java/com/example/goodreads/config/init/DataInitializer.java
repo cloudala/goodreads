@@ -1,9 +1,12 @@
-package com.example.goodreads.config;
+package com.example.goodreads.config.init;
 
+import com.example.goodreads.dto.auth.RegisterRequest;
 import com.example.goodreads.model.*;
 import com.example.goodreads.repository.BookRepository;
 import com.example.goodreads.repository.ShelfRepository;
 import com.example.goodreads.repository.UserRepository;
+import com.example.goodreads.service.AuthService;
+import com.example.goodreads.service.user.ShelfService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +18,7 @@ public class DataInitializer {
     @Bean
     public CommandLineRunner loadData(
             UserRepository userRepository,
+            ShelfService shelfService,
             ShelfRepository shelfRepository,
             BookRepository bookRepository,
             PasswordEncoder passwordEncoder
@@ -26,12 +30,14 @@ public class DataInitializer {
             alice.setEmail("alice@example.com");
             alice.setPassword(passwordEncoder.encode("password"));
             alice.setRole(Role.USER);
+            shelfService.createDefaultShelves(alice);
 
             User bob = new User();
             bob.setUsername("bob");
             bob.setEmail("bob@example.com");
             bob.setPassword(passwordEncoder.encode("password"));
             bob.setRole(Role.USER);
+            shelfService.createDefaultShelves(bob);
 
             userRepository.save(alice);
             userRepository.save(bob);

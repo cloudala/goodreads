@@ -1,4 +1,4 @@
-package com.example.goodreads.controller.admin;
+package com.example.goodreads.controller.rest.admin;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;

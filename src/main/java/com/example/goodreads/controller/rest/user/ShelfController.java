@@ -1,4 +1,4 @@
-package com.example.goodreads.controller.user;
+package com.example.goodreads.controller.rest.user;
 
 import com.example.goodreads.dto.shelf.ShelfDetailsResponse;
 import com.example.goodreads.dto.shelf.ShelfRequest;
@@ -59,5 +59,24 @@ public class ShelfController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/{shelfId}/books/{bookId}")
+    public ResponseEntity<Void> addBookToShelf(
+            Authentication authentication,
+            @PathVariable Long shelfId,
+            @PathVariable Long bookId) {
+        String username = authentication.getName();
+        shelfService.addBookToShelf(username, shelfId, bookId);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{shelfId}/books/{bookId}")
+    public ResponseEntity<Void> removeBookFromShelf(
+            Authentication authentication,
+            @PathVariable Long shelfId,
+            @PathVariable Long bookId) {
+        String username = authentication.getName();
+        shelfService.removeBookFromShelf(username, shelfId, bookId);
+        return ResponseEntity.noContent().build();
+    }
 
 }

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+
+<head>
+    <title>Edit Book</title>
+</head>
+
+<body>
+
+<section layout:fragment="content">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">Edit Book</h2>
+        <a th:href="@{/admin/books}" class="btn btn-secondary">Back to List</a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <form th:action="@{|/admin/books/edit/${book.id}|}" th:object="${book}" method="post">
+
+                <!-- Title -->
+                <div class="mb-3">
+                    <label for="title" class="form-label">Title</label>
+                    <input type="text" th:field="*{title}"
+                           class="form-control"
+                           th:classappend="${#fields.hasErrors('title')} ? 'is-invalid' : ''"
+                           id="title" placeholder="Enter book title">
+                    <div class="invalid-feedback" th:errors="*{title}"></div>
+                </div>
+
+                <!-- Author -->
+                <div class="mb-3">
+                    <label for="author" class="form-label">Author</label>
+                    <input type="text" th:field="*{author}"
+                           class="form-control"
+                           th:classappend="${#fields.hasErrors('author')} ? 'is-invalid' : ''"
+                           id="author" placeholder="Enter author name">
+                    <div class="invalid-feedback" th:errors="*{author}"></div>
+                </div>
+
+                <!-- ISBN -->
+                <div class="mb-3">
+                    <label for="isbn" class="form-label">ISBN</label>
+                    <input type="text" th:field="*{isbn}"
+                           class="form-control"
+                           th:classappend="${#fields.hasErrors('isbn')} ? 'is-invalid' : ''"
+                           id="isbn" placeholder="Enter ISBN">
+                    <div class="invalid-feedback" th:errors="*{isbn}"></div>
+                </div>
+
+                <!-- Publication Year -->
+                <div class="mb-3">
+                    <label for="publicationYear" class="form-label">Publication Year</label>
+                    <input type="number" th:field="*{publicationYear}"
+                           class="form-control"
+                           th:classappend="${#fields.hasErrors('publicationYear')} ? 'is-invalid' : ''"
+                           id="publicationYear" placeholder="Enter year" min="0">
+                    <div class="invalid-feedback" th:errors="*{publicationYear}"></div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary">Update Book</button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</section>
+
+</body>
+</html>
