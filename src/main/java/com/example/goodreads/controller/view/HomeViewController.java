@@ -1,6 +1,6 @@
 package com.example.goodreads.controller.view;
 
-import com.example.goodreads.service.BookService;
+import com.example.goodreads.service.user.BookService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;

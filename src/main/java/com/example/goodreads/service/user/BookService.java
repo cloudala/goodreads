@@ -1,12 +1,21 @@
-package com.example.goodreads.service;
+package com.example.goodreads.service.user;
 
+import com.example.goodreads.dto.book.BookResponse;
 import com.example.goodreads.model.Book;
+import com.example.goodreads.repository.BookRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BookService {
+    private final BookRepository bookRepository;
+
+    public BookService(BookRepository bookRepository) {
+        this.bookRepository = bookRepository;
+    }
+
     // Return a few featured books (hardcoded)
     public List<Book> getFeaturedBooks() {
         return List.of(
@@ -24,5 +33,19 @@ public class BookService {
                 new Book("Project Hail Mary", "Andy Weir", "9780593135204", 2021),
                 new Book("Dune", "Frank Herbert", "9780441013593", 1965)
         );
+    }
+
+    public List<BookResponse> getAllBooks() {
+        List<Book> books = bookRepository.findAll();
+        return books.stream()
+                .map(b -> new BookResponse(b.getId(), b.getTitle(), b.getAuthor()))
+                .collect(Collectors.toList());
+    }
+
+    public List<BookResponse> searchBooks(String query) {
+        List<Book> books = bookRepository.searchByTitleOrAuthor(query);
+        return books.stream()
+                .map(b -> new BookResponse(b.getId(), b.getTitle(), b.getAuthor()))
+                .collect(Collectors.toList());
     }
 }
