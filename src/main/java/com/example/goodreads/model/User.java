@@ -33,6 +33,14 @@ public class User {
     )
     private Set<Shelf> shelves = new HashSet<>();
 
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private Set<Review> reviews = new HashSet<>();
+
+
     public User(Long id, String username, String email, String password) {
         this.id = id;
         this.username = username;
@@ -89,6 +97,14 @@ public class User {
 
     public void setShelves(Set<Shelf> shelves) {
         this.shelves = shelves;
+    }
+
+    public Set<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(Set<Review> reviews) {
+        this.reviews = reviews;
     }
 
     // -------- Helper methods --------

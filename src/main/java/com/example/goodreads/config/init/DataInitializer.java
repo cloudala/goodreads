@@ -3,6 +3,7 @@ package com.example.goodreads.config.init;
 import com.example.goodreads.dto.auth.RegisterRequest;
 import com.example.goodreads.model.*;
 import com.example.goodreads.repository.BookRepository;
+import com.example.goodreads.repository.ReviewRepository;
 import com.example.goodreads.repository.ShelfRepository;
 import com.example.goodreads.repository.UserRepository;
 import com.example.goodreads.service.AuthService;
@@ -21,6 +22,7 @@ public class DataInitializer {
             ShelfService shelfService,
             ShelfRepository shelfRepository,
             BookRepository bookRepository,
+            ReviewRepository reviewRepository,
             PasswordEncoder passwordEncoder
     ) {
         return args -> {
@@ -67,6 +69,17 @@ public class DataInitializer {
 
             shelfRepository.save(shelf1);
             shelfRepository.save(shelf2);
+
+            // ---------- REVIEWS ----------
+            Review review1 = new Review(5, "Absolutely loved it!", alice, book1);
+            Review review2 = new Review(4, "Great book, a classic.", bob, book1);
+            Review review3 = new Review(3, "Interesting, but a bit dated.", alice, book2);
+            Review review4 = new Review(5, "Must-read for developers.", bob, book3);
+
+            reviewRepository.save(review1);
+            reviewRepository.save(review2);
+            reviewRepository.save(review3);
+            reviewRepository.save(review4);
 
             System.out.println("🌱 Initial test data loaded.");
         };
