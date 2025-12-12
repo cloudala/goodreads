@@ -1,8 +1,12 @@
 package com.example.goodreads.service.user;
 
+import com.example.goodreads.dto.PaginatedResponse;
 import com.example.goodreads.dto.book.BookResponse;
 import com.example.goodreads.model.Book;
 import com.example.goodreads.repository.BookRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,17 +39,47 @@ public class BookService {
         );
     }
 
-    public List<BookResponse> getAllBooks() {
-        List<Book> books = bookRepository.findAll();
-        return books.stream()
-                .map(b -> new BookResponse(b.getId(), b.getTitle(), b.getAuthor()))
+    // ---------------- Private helper method ----------------
+    private List<BookResponse> mapBooksWithAvgRating(List<Object[]> results) {
+        return results.stream()
+                .map(obj -> {
+                    Book book = (Book) obj[0];
+                    Double avgRating = (Double) obj[1];
+                    return new BookResponse(
+                            book.getId(),
+                            book.getTitle(),
+                            book.getAuthor(),
+                            avgRating
+                    );
+                })
                 .collect(Collectors.toList());
     }
 
-    public List<BookResponse> searchBooks(String query) {
-        List<Book> books = bookRepository.searchByTitleOrAuthor(query);
-        return books.stream()
-                .map(b -> new BookResponse(b.getId(), b.getTitle(), b.getAuthor()))
-                .collect(Collectors.toList());
+    public PaginatedResponse<BookResponse> getAllBooks(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Object[]> results = bookRepository.findAllBooksWithAverageRating(pageable);
+        List<BookResponse> content = mapBooksWithAvgRating(results.getContent());
+        return new PaginatedResponse<>(content, results.getNumber(), results.getSize(), results.getTotalElements(), results.getTotalPages());
     }
+
+    public PaginatedResponse<BookResponse> searchBooks(String query, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Object[]> results = bookRepository.searchBooksWithAverageRating(query, pageable);
+        List<BookResponse> content = mapBooksWithAvgRating(results.getContent());
+        return new PaginatedResponse<>(content, results.getNumber(), results.getSize(), results.getTotalElements(), results.getTotalPages());
+    }
+
+//    public List<BookResponse> getAllBooks() {
+//        List<Book> books = bookRepository.findAll();
+//        return books.stream()
+//                .map(b -> new BookResponse(b.getId(), b.getTitle(), b.getAuthor(), 0.0))
+//                .collect(Collectors.toList());
+//    }
+
+//    public List<BookResponse> searchBooks(String query) {
+//        List<Book> books = bookRepository.searchByTitleOrAuthorOrIsbn(query);
+//        return books.stream()
+//                .map(b -> new BookResponse(b.getId(), b.getTitle(), b.getAuthor(), 0.0))
+//                .collect(Collectors.toList());
+//    }
 }

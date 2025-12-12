@@ -25,6 +25,13 @@ public class Book {
     @ManyToMany(mappedBy = "books", fetch = FetchType.LAZY)
     private Set<Shelf> shelves = new HashSet<>();
 
+    @OneToMany(
+            mappedBy = "book",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private Set<Review> reviews = new HashSet<>();
+
     public Book() {}
 
     public Book(String title, String author, String isbn, int publicationYear) {

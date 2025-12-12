@@ -29,6 +29,22 @@ public class ShelfService {
         this.userService = userService;
     }
 
+    private List<BookResponse> mapBooksWithAvgRating(List<Object[]> results) {
+        return results.stream()
+                .map(obj -> {
+                    Book book = (Book) obj[0];
+                    Double avgRating = (Double) obj[1];
+                    return new BookResponse(
+                            book.getId(),
+                            book.getTitle(),
+                            book.getAuthor(),
+                            avgRating
+                    );
+                })
+                .toList();
+    }
+
+
     public void createDefaultShelves(User user) {
         Shelf read = new Shelf("Read");
         read.setType(ShelfType.READ);
@@ -59,13 +75,9 @@ public class ShelfService {
         Shelf shelf = shelfRepository.findByIdAndUserId(shelfId, user.getId())
                 .orElseThrow(() -> new ShelfNotFoundException("Shelf not found"));
 
-        List<BookResponse> bookResponses = shelf.getBooks().stream()
-                .map(book -> new BookResponse(
-                        book.getId(),
-                        book.getTitle(),
-                        book.getAuthor()
-                ))
-                .toList();
+        List<Object[]> results = bookRepository.findBooksWithAverageRatingByShelfId(shelfId);
+
+        List<BookResponse> bookResponses = mapBooksWithAvgRating(results);
 
         return new ShelfDetailsResponse(shelf.getId(), shelf.getName(), bookResponses);
     }
