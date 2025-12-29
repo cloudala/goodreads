@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+
+<head>
+    <title>Edit Shelf</title>
+</head>
+
+<body>
+
+<section layout:fragment="content">
+    <h2>Edit Shelf</h2>
+
+    <form th:action="@{|/shelves/edit/${shelf.id}|}" th:object="${shelf}" method="post">
+        <div class="mb-3">
+            <label>Name</label>
+            <input type="text" th:field="*{name}" class="form-control"/>
+            <div class="text-danger" th:errors="*{name}"></div>
+        </div>
+
+        <button class="btn btn-primary">Update</button>
+    </form>
+
+
+</section>
+
+</body>
+</html>

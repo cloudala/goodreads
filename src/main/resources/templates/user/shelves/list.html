@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Shelves</title>
+</head>
+<body>
+
+<section layout:fragment="content">
+    <h2>Your Shelves</h2>
+
+    <a class="btn btn-success mb-3" th:href="@{/shelves/add}">Add shelf</a>
+
+    <table class="table">
+        <tr>
+            <th>Name</th>
+            <th>Actions</th>
+        </tr>
+        <tr th:each="shelf : ${shelves}">
+            <td th:text="${shelf.name}"></td>
+            <td>
+                <a th:href="@{'/shelves/edit/' + ${shelf.id}}" class="btn btn-sm btn-primary">Edit</a>
+                <a th:href="@{'/shelves/delete/' + ${shelf.id}}"
+                   class="btn btn-sm btn-danger"
+                   onclick="return confirm('Delete shelf?');">Delete</a>
+            </td>
+        </tr>
+    </table>
+</section>
+
+</body>
+</html>
