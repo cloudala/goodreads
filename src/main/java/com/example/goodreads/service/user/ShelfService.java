@@ -37,7 +37,8 @@ public class ShelfService {
                     return new BookResponse(
                             book.getId(),
                             book.getTitle(),
-                            book.getAuthor(),
+                            book.getAuthor().getName(),
+                            // book.getAuthor(),
                             avgRating
                     );
                 })

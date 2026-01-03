@@ -38,6 +38,17 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(AuthorNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleAuthorNotFound(AuthorNotFoundException ex,
+                                                             HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.NOT_FOUND, request);
+    }
+    @ExceptionHandler(BookNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleBookNotFound(BookNotFoundException ex,
+                                                           HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.NOT_FOUND, request);
+    }
+
     @ExceptionHandler(ShelfNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleShelfNotFound(ShelfNotFoundException ex,
                                                                 HttpServletRequest request) {

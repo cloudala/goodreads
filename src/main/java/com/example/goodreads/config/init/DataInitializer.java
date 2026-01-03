@@ -1,87 +1,80 @@
 package com.example.goodreads.config.init;
 
-import com.example.goodreads.dto.auth.RegisterRequest;
+import com.example.goodreads.exception.BookNotFoundException;
 import com.example.goodreads.model.*;
-import com.example.goodreads.repository.BookRepository;
-import com.example.goodreads.repository.ReviewRepository;
-import com.example.goodreads.repository.ShelfRepository;
-import com.example.goodreads.repository.UserRepository;
-import com.example.goodreads.service.AuthService;
+import com.example.goodreads.repository.*;
 import com.example.goodreads.service.user.ShelfService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
 @Configuration
 public class DataInitializer {
 
     @Bean
+    @Transactional  // important for lazy loading relationships
     public CommandLineRunner loadData(
             UserRepository userRepository,
             ShelfService shelfService,
             ShelfRepository shelfRepository,
             BookRepository bookRepository,
+            AuthorRepository authorRepository,
             ReviewRepository reviewRepository,
             PasswordEncoder passwordEncoder
     ) {
         return args -> {
             // ---------- USERS ----------
-            User alice = new User();
-            alice.setUsername("alice");
-            alice.setEmail("alice@example.com");
-            alice.setPassword(passwordEncoder.encode("password"));
-            alice.setRole(Role.USER);
-            shelfService.createDefaultShelves(alice);
+                User alice = new User();
+                alice.setUsername("alice");
+                alice.setEmail("alice@example.com");
+                alice.setPassword(passwordEncoder.encode("password"));
+                alice.setRole(Role.USER);
+                userRepository.save(alice);
 
-            User bob = new User();
-            bob.setUsername("bob");
-            bob.setEmail("bob@example.com");
-            bob.setPassword(passwordEncoder.encode("password"));
-            bob.setRole(Role.USER);
-            shelfService.createDefaultShelves(bob);
+                User bob = new User();
+                bob.setUsername("bob");
+                bob.setEmail("bob@example.com");
+                bob.setPassword(passwordEncoder.encode("password"));
+                bob.setRole(Role.USER);
+                userRepository.save(bob);
 
-            userRepository.save(alice);
-            userRepository.save(bob);
+                // ---------- SHELVES ----------
+                Shelf favorites = new Shelf("Favorites");
+                Shelf toRead = new Shelf("To Read");
 
-            // ---------- BOOKS ----------
-            Book book1 = new Book("The Hobbit", "J.R.R. Tolkien", "9780261103344", 1937);
-            Book book2 = new Book("1984", "George Orwell", "9780451524935", 1949);
-            Book book3 = new Book("Clean Code", "Robert C. Martin", "9780132350884", 2008);
+                alice.addShelf(favorites);
+                alice.addShelf(toRead);
 
-            bookRepository.save(book1);
-            bookRepository.save(book2);
-            bookRepository.save(book3);
+                shelfRepository.save(favorites);
+                shelfRepository.save(toRead);
 
-            // ---------- SHELVES ----------
-            Shelf shelf1 = new Shelf("Favorites");
-            Shelf shelf2 = new Shelf("To Read");
+                // ---------- BOOKS ----------
+                Book pride = bookRepository.findByTitleIgnoreCaseWithAuthor("Pride and Prejudice")
+                        .orElseThrow(() -> new BookNotFoundException("Book not found: Pride and Prejudice"));
+                Book gatsby = bookRepository.findByTitleIgnoreCaseWithAuthor("The Great Gatsby")
+                        .orElseThrow(() -> new BookNotFoundException("Book not found: The Great Gatsby"));
+                Book mockingbird = bookRepository.findByTitleIgnoreCaseWithAuthor("To Kill a Mockingbird")
+                        .orElseThrow(() -> new BookNotFoundException("Book not found: To Kill a Mockingbird"));
 
-            // assign shelves to users
-            alice.addShelf(shelf1);
-            alice.addShelf(shelf2);
+                // ---------- RELATIONSHIPS: Add books to shelves ----------
+                favorites.addBook(pride);
+                favorites.addBook(mockingbird);
+                toRead.addBook(gatsby);
 
-            // ---------- RELATIONSHIPS: Add books to shelves ----------
-            shelf1.addBook(book1); // favorites has The Hobbit
-            shelf1.addBook(book3); // and Clean Code
+                // ---------- REVIEWS ----------
+                Review r1 = new Review(5, "Absolutely loved it!", alice, pride);
+                Review r2 = new Review(4, "Great book, a classic.", bob, pride);
+                Review r3 = new Review(3, "Interesting, but a bit dated.", alice, gatsby);
+                Review r4 = new Review(5, "Must-read!", bob, mockingbird);
 
-            shelf2.addBook(book2); // to-read has 1984
+                reviewRepository.save(r1);
+                reviewRepository.save(r2);
+                reviewRepository.save(r3);
+                reviewRepository.save(r4);
 
-            shelfRepository.save(shelf1);
-            shelfRepository.save(shelf2);
-
-            // ---------- REVIEWS ----------
-            Review review1 = new Review(5, "Absolutely loved it!", alice, book1);
-            Review review2 = new Review(4, "Great book, a classic.", bob, book1);
-            Review review3 = new Review(3, "Interesting, but a bit dated.", alice, book2);
-            Review review4 = new Review(5, "Must-read for developers.", bob, book3);
-
-            reviewRepository.save(review1);
-            reviewRepository.save(review2);
-            reviewRepository.save(review3);
-            reviewRepository.save(review4);
-
-            System.out.println("🌱 Initial test data loaded.");
+                System.out.println("🌱 Initial test data loaded successfully.");
         };
     }
 }

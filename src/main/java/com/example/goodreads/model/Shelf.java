@@ -83,11 +83,11 @@ public class Shelf {
     // -------- Helper methods --------
     public void addBook(Book book) {
         books.add(book);
-        book.getShelves().add(this);
+        // book.getShelves().add(this);
     }
 
     public void removeBook(Book book) {
         books.remove(book);
-        book.getShelves().remove(this);
+        // book.getShelves().remove(this);
     }
 }

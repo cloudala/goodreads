@@ -4,8 +4,10 @@ import com.example.goodreads.dto.admin.book.AdminBookResponse;
 import com.example.goodreads.dto.admin.book.AdminCreateBookRequest;
 import com.example.goodreads.dto.admin.book.AdminUpdateBookRequest;
 import com.example.goodreads.exception.BookNotFoundException;
+import com.example.goodreads.model.Author;
 import com.example.goodreads.model.Book;
 import com.example.goodreads.model.Shelf;
+import com.example.goodreads.repository.AuthorRepository;
 import com.example.goodreads.repository.BookRepository;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +17,19 @@ import java.util.List;
 @Service
 public class AdminBookService {
     private final BookRepository bookRepository;
+    private final AuthorRepository authorRepository;
 
-    public AdminBookService(BookRepository bookRepository) {
+    public AdminBookService(BookRepository bookRepository, AuthorRepository authorRepository) {
         this.bookRepository = bookRepository;
+        this.authorRepository = authorRepository;
     }
+
+    private Author getOrCreateAuthor(String name) {
+        return authorRepository
+                .findByNameIgnoreCase(name)
+                .orElseGet(() -> authorRepository.save(new Author(name)));
+    }
+
 
     // --------- PRIVATE HELPER METHOD ---------
     public Book getBookByIdInternal(Long id) {
@@ -32,7 +43,8 @@ public class AdminBookService {
         return new AdminBookResponse(
                 book.getId(),
                 book.getTitle(),
-                book.getAuthor(),
+                book.getAuthor().getName(),
+                // book.getAuthor(),
                 book.getIsbn(),
                 book.getPublicationYear()
         );
@@ -40,7 +52,7 @@ public class AdminBookService {
 
     // --------- CRUD METHODS --------
     public List<AdminBookResponse> getAllBooks() {
-        return bookRepository.findAll().stream().map(book -> mapToResponse(book)).toList();
+        return bookRepository.findAllWithAuthor().stream().map(book -> mapToResponse(book)).toList();
     }
 
     public AdminBookResponse getBookById(Long id) {
@@ -53,7 +65,12 @@ public class AdminBookService {
     public AdminBookResponse createBook(AdminCreateBookRequest request) {
         Book book = new Book();
         book.setTitle(request.getTitle());
-        book.setAuthor(request.getAuthor());
+
+        Author author = getOrCreateAuthor(request.getAuthor());
+        book.setAuthor(author);
+
+        // book.setAuthor(request.getAuthor());
+
         book.setIsbn(request.getIsbn());
         book.setPublicationYear(request.getPublicationYear());
         Book savedBook = bookRepository.save(book);
@@ -65,9 +82,17 @@ public class AdminBookService {
         if (request.getTitle() != null) {
             book.setTitle(request.getTitle());
         }
+
         if (request.getAuthor() != null) {
-            book.setAuthor(request.getAuthor());
+            Author author = getOrCreateAuthor(request.getAuthor());
+            book.setAuthor(author);
         }
+
+
+//        if (request.getAuthor() != null) {
+//            book.setAuthor(request.getAuthor());
+//        }
+
         if (request.getIsbn() != null) {
             book.setIsbn(request.getIsbn());
         }
