@@ -63,6 +63,9 @@ public class DataInitializer {
                 favorites.addBook(mockingbird);
                 toRead.addBook(gatsby);
 
+                shelfRepository.save(favorites);
+                shelfRepository.save(toRead);
+
                 // ---------- REVIEWS ----------
                 Review r1 = new Review(5, "Absolutely loved it!", alice, pride);
                 Review r2 = new Review(4, "Great book, a classic.", bob, pride);

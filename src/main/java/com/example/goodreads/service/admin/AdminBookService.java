@@ -108,7 +108,7 @@ public class AdminBookService {
 
         // Remove book from all shelves before deletion
         for (Shelf shelf : new HashSet<>(book.getShelves())) {
-            shelf.getBooks().remove(book);
+            shelf.getShelfBooks().remove(book);
             book.getShelves().remove(shelf);
         }
 

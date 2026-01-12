@@ -26,13 +26,8 @@ public class Shelf {
     private User user;
 
     // ------------ BOOK RELATION ------------
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "shelf_books",
-            joinColumns = @JoinColumn(name = "shelf_id"),
-            inverseJoinColumns = @JoinColumn(name = "book_id")
-    )
-    private Set<Book> books = new HashSet<>();
+    @OneToMany(mappedBy = "shelf", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ShelfBook> shelfBooks = new HashSet<>();
 
     public Shelf() {}
 
@@ -72,22 +67,23 @@ public class Shelf {
         this.user = user;
     }
 
-    public Set<Book> getBooks() {
-        return books;
+    public Set<ShelfBook> getShelfBooks() {
+        return shelfBooks;
     }
 
-    public void setBooks(Set<Book> books) {
-        this.books = books;
+    public void setShelfBooks(Set<ShelfBook> books) {
+        this.shelfBooks = books;
     }
 
     // -------- Helper methods --------
     public void addBook(Book book) {
-        books.add(book);
+        ShelfBook shelfBook = new ShelfBook(this, book);
+        shelfBooks.add(shelfBook);
         // book.getShelves().add(this);
     }
 
     public void removeBook(Book book) {
-        books.remove(book);
+        shelfBooks.removeIf(shelfBook -> shelfBook.getBook().equals(book));
         // book.getShelves().remove(this);
     }
 }

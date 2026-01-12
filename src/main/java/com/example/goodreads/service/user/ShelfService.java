@@ -138,4 +138,20 @@ public class ShelfService {
         shelfRepository.save(shelf);
     }
 
+    @Transactional
+    public void moveBookFromShelfToShelf(String username, Long fromShelfId, Long toShelfId, Long bookId) {
+        User user = userService.getCurrentUser(username);
+        Shelf fromShelf = shelfRepository.findByIdAndUserId(fromShelfId, user.getId())
+                .orElseThrow(() -> new ShelfNotFoundException("Source shelf with id " + fromShelfId + " not found"));
+        Shelf toShelf = shelfRepository.findByIdAndUserId(toShelfId, user.getId())
+                .orElseThrow(() -> new ShelfNotFoundException("Destination shelf with id " + toShelfId + " not found"));
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new BookNotFoundException("Book with id " + bookId + " not found"));
+
+        fromShelf.removeBook(book);
+        toShelf.addBook(book);
+
+        shelfRepository.save(fromShelf);
+        shelfRepository.save(toShelf);
+    }
 }

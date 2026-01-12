@@ -93,6 +93,12 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, request);
     }
 
+    @ExceptionHandler(InvalidShelfActionException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidShelfAction(InvalidShelfActionException ex,
+                                                                  HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, request);
+    }
+
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneric(Exception ex,

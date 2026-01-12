@@ -2,10 +2,14 @@ package com.example.goodreads.service.user;
 
 import com.example.goodreads.dto.PaginatedResponse;
 import com.example.goodreads.dto.book.BookResponse;
+import com.example.goodreads.dto.book.BookWithReviewsResponse;
+import com.example.goodreads.dto.review.ReviewResponse;
 import com.example.goodreads.model.Author;
 import com.example.goodreads.model.Book;
+import com.example.goodreads.model.Review;
 import com.example.goodreads.repository.AuthorRepository;
 import com.example.goodreads.repository.BookRepository;
+import com.example.goodreads.repository.ReviewRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,10 +22,12 @@ import java.util.stream.Collectors;
 public class BookService {
     private final BookRepository bookRepository;
     private final AuthorRepository authorRepository;
+    private final ReviewRepository reviewRepository;
 
-    public BookService(BookRepository bookRepository, AuthorRepository authorRepository) {
+    public BookService(BookRepository bookRepository, AuthorRepository authorRepository, ReviewRepository reviewRepository) {
         this.bookRepository = bookRepository;
         this.authorRepository = authorRepository;
+        this.reviewRepository = reviewRepository;
     }
 
     private Author getOrCreateAuthor(String name) {
@@ -77,8 +83,30 @@ public class BookService {
     public PaginatedResponse<BookResponse> getAllBooks(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Object[]> results = bookRepository.findAllBooksWithAverageRating(pageable);
+        System.out.println(results.getContent().get(0)[0].toString());
         List<BookResponse> content = mapBooksWithAvgRating(results.getContent());
         return new PaginatedResponse<>(content, results.getNumber(), results.getSize(), results.getTotalElements(), results.getTotalPages());
+    }
+
+    public BookWithReviewsResponse getBookById(Long bookId) {
+        List<Object[]> resultList = bookRepository.findBookByIdWithAverageRating(bookId);
+        Object[] result = resultList.stream().findFirst().orElseThrow(() -> new RuntimeException("Book not found with id: " + bookId));
+        if (result == null || result[0] == null) {
+            throw new RuntimeException("Book not found with id: " + bookId);
+        }
+        Book book = (Book) result[0];
+        Double avgRating = (Double) result[1];
+        List<Review> reviews = reviewRepository.findByBookId(bookId);
+        List<ReviewResponse> reviewResponses = reviews.stream()
+                .map(r -> new ReviewResponse(r.getId(), r.getRating(), r.getComment(), r.getUser().getUsername(), r.getCreatedAt()))
+                .collect(Collectors.toList());
+        return new BookWithReviewsResponse(
+                book.getId(),
+                book.getTitle(),
+                book.getAuthor().getName(),
+                avgRating,
+                reviewResponses
+        );
     }
 
     public PaginatedResponse<BookResponse> searchBooks(String query, int page, int size) {

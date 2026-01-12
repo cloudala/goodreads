@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "books")
@@ -27,8 +28,8 @@ public class Book {
 
     private int publicationYear;
 
-    @ManyToMany(mappedBy = "books", fetch = FetchType.LAZY)
-    private Set<Shelf> shelves = new HashSet<>();
+    @OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
+    private Set<ShelfBook> shelfBooks = new HashSet<>();
 
     @OneToMany(
             mappedBy = "book",
@@ -87,10 +88,13 @@ public class Book {
     }
 
     public Set<Shelf> getShelves() {
-        return shelves;
+        return shelfBooks.stream().map(shelfBook -> shelfBook.getShelf()).collect(Collectors.toSet());
     }
 
     public void setShelves(Set<Shelf> shelves) {
-        this.shelves = shelves;
+        shelves.forEach(shelf -> {
+            ShelfBook newShelfBook = new ShelfBook(shelf, this);
+            this.shelfBooks.add(newShelfBook);
+        });
     }
 }

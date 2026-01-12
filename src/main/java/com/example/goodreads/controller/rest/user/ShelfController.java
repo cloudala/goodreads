@@ -1,8 +1,10 @@
 package com.example.goodreads.controller.rest.user;
 
+import com.example.goodreads.dto.shelf.ShelfActionRequest;
 import com.example.goodreads.dto.shelf.ShelfDetailsResponse;
 import com.example.goodreads.dto.shelf.ShelfRequest;
 import com.example.goodreads.dto.shelf.ShelfResponse;
+import com.example.goodreads.exception.InvalidShelfActionException;
 import com.example.goodreads.service.user.ShelfService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -59,24 +61,19 @@ public class ShelfController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{shelfId}/books/{bookId}")
-    public ResponseEntity<Void> addBookToShelf(
+    @PostMapping("/{fromShelfId}/books")
+    public ResponseEntity<Void> shelfBookAction(
             Authentication authentication,
-            @PathVariable Long shelfId,
-            @PathVariable Long bookId) {
+            @PathVariable Long fromShelfId,
+            @RequestBody ShelfActionRequest shelfActionRequest) {
         String username = authentication.getName();
-        shelfService.addBookToShelf(username, shelfId, bookId);
+        switch (shelfActionRequest.getAction()) {
+            case ADD_BOOK -> shelfService.addBookToShelf(username, fromShelfId, shelfActionRequest.getBookId());
+            case REMOVE_BOOK -> shelfService.removeBookFromShelf(username, fromShelfId, shelfActionRequest.getBookId());
+            case MOVE_BOOK_TO_SHELF -> shelfService.moveBookFromShelfToShelf(username, fromShelfId, shelfActionRequest.getDestinationShelfId(), shelfActionRequest.getBookId());
+            default -> throw new InvalidShelfActionException("Invalid shelf action");
+        }
         return ResponseEntity.ok().build();
-    }
-
-    @DeleteMapping("/{shelfId}/books/{bookId}")
-    public ResponseEntity<Void> removeBookFromShelf(
-            Authentication authentication,
-            @PathVariable Long shelfId,
-            @PathVariable Long bookId) {
-        String username = authentication.getName();
-        shelfService.removeBookFromShelf(username, shelfId, bookId);
-        return ResponseEntity.noContent().build();
     }
 
 }

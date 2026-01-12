@@ -36,15 +36,27 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     // ------------------- BOOKS BY SHELF ID WITH AVERAGE RATING -------------------
     @Query("""
-    SELECT b, COALESCE(AVG(r.rating), 0) as avgRating
+    SELECT sb.book, COALESCE(AVG(r.rating), 0) as avgRating
     FROM Shelf s
-    JOIN s.books b
+    JOIN s.shelfBooks sb
+    JOIN sb.book b
     LEFT JOIN b.reviews r
     WHERE s.id = :shelfId
     GROUP BY b
     ORDER BY b.id
 """)
     List<Object[]> findBooksWithAverageRatingByShelfId(@Param("shelfId") Long shelfId);
+
+    // ------------------- BOOK BY ID WITH AVERAGE RATING -------------------
+    @Query("""
+    SELECT b, COALESCE(AVG(r.rating), 0) as avgRating
+    FROM Book b
+    LEFT JOIN b.reviews r
+    WHERE b.id = :bookId
+    GROUP BY b
+""")
+    List<Object[]> findBookByIdWithAverageRating(@Param("bookId") Long bookId);
+
 
     // ------------------- BOOKS SEARCHED BY TITLE, AUTHOR OR ISBN WITH AVERAGE RATING WITHOUT PAGINATION -------------------
     @Query("SELECT b FROM Book b WHERE LOWER(b.title) LIKE LOWER(CONCAT('%', :query, '%')) " +
