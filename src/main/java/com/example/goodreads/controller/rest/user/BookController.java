@@ -3,6 +3,7 @@ package com.example.goodreads.controller.rest.user;
 import com.example.goodreads.dto.PaginatedResponse;
 import com.example.goodreads.dto.book.BookResponse;
 import com.example.goodreads.dto.book.BookWithReviewsResponse;
+import com.example.goodreads.dto.book.PopularBookResponse;
 import com.example.goodreads.repository.BookRepository;
 import com.example.goodreads.service.user.BookService;
 import org.springframework.data.domain.Page;
