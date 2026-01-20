@@ -45,7 +45,7 @@ public class ShelfService {
                 .toList();
     }
 
-
+    @Transactional
     public void createDefaultShelves(User user) {
         Shelf read = new Shelf("Read");
         read.setType(ShelfType.READ);
@@ -154,4 +154,5 @@ public class ShelfService {
         shelfRepository.save(fromShelf);
         shelfRepository.save(toShelf);
     }
+
 }
