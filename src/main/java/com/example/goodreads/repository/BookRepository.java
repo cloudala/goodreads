@@ -72,4 +72,5 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     @Query("SELECT b FROM Book b JOIN FETCH b.author WHERE UPPER(b.title) = UPPER(:title)")
     Optional<Book> findByTitleIgnoreCaseWithAuthor(@Param("title") String title);
 
+    Optional<Book> findById(Long id);
 }
