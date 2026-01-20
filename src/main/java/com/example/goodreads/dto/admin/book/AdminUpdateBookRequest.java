@@ -1,9 +1,12 @@
 package com.example.goodreads.dto.admin.book;
 
+import com.example.goodreads.validation.PubYearPastOrPresent;
+
 public class AdminUpdateBookRequest {
     private String title;
     private String author;
     private String isbn;
+    @PubYearPastOrPresent
     private Integer publicationYear;
 
     public AdminUpdateBookRequest() {}

@@ -1,9 +1,16 @@
 package com.example.goodreads.dto.admin.book;
 
+import com.example.goodreads.validation.PubYearPastOrPresent;
+import jakarta.validation.constraints.NotBlank;
+
 public class AdminCreateBookRequest {
+    @NotBlank(message = "Title must not be blank")
     private String title;
+    @NotBlank(message = "Author must not be blank")
     private String author;
+    @NotBlank(message = "ISBN must not be blank")
     private String isbn;
+    @PubYearPastOrPresent
     private Integer publicationYear;
 
     public AdminCreateBookRequest() {
