@@ -12,7 +12,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 
 @Configuration
 @EnableMethodSecurity
@@ -23,8 +22,8 @@ public class SecurityConfig {
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
-                          AuthEntryPointJwt unauthorizedHandler,
-                          CustomAccessDeniedHandler customAccessDeniedHandler) {
+            AuthEntryPointJwt unauthorizedHandler,
+            CustomAccessDeniedHandler customAccessDeniedHandler) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.unauthorizedHandler = unauthorizedHandler;
         this.customAccessDeniedHandler = customAccessDeniedHandler;
@@ -40,27 +39,31 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http
-//                .csrf(csrf -> csrf.disable())
-//                .exceptionHandling(e ->
-//                        e
-//                        .authenticationEntryPoint(unauthorizedHandler)
-//                        .accessDeniedHandler(customAccessDeniedHandler)
-//                )
-//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//                .authorizeHttpRequests(request -> request
-//                        .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
-//                        .requestMatchers("/api/books/**").permitAll()
-//                        .requestMatchers("/api/auth/**").permitAll()
-//                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-//                        .anyRequest().authenticated()
-//                );
-//
-//        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-//        return http.build();
-//    }
+    // @Bean
+    // public SecurityFilterChain securityFilterChain(HttpSecurity http) throws
+    // Exception {
+    // http
+    // .csrf(csrf -> csrf.disable())
+    // .exceptionHandling(e ->
+    // e
+    // .authenticationEntryPoint(unauthorizedHandler)
+    // .accessDeniedHandler(customAccessDeniedHandler)
+    // )
+    // .sessionManagement(session ->
+    // session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+    // .authorizeHttpRequests(request -> request
+    // .requestMatchers("/swagger-ui/**", "/swagger-ui.html",
+    // "/v3/api-docs/**").permitAll()
+    // .requestMatchers("/api/books/**").permitAll()
+    // .requestMatchers("/api/auth/**").permitAll()
+    // .requestMatchers("/api/admin/**").hasRole("ADMIN")
+    // .anyRequest().authenticated()
+    // );
+    //
+    // http.addFilterBefore(jwtAuthenticationFilter,
+    // UsernamePasswordAuthenticationFilter.class);
+    // return http.build();
+    // }
 
     @Bean
     @Order(1)
@@ -68,17 +71,13 @@ public class SecurityConfig {
         http
                 .securityMatcher("/api/**")
                 .csrf(csrf -> csrf.disable())
-                .exceptionHandling(e ->
-                        e.authenticationEntryPoint(unauthorizedHandler)
-                        .accessDeniedHandler(customAccessDeniedHandler)
-                )
-                // .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(e -> e.authenticationEntryPoint(unauthorizedHandler)
+                        .accessDeniedHandler(customAccessDeniedHandler))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -88,21 +87,18 @@ public class SecurityConfig {
     @Order(2)
     public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
         http
-                .securityMatcher(request -> !request.getRequestURI().startsWith("/api"))
+                .securityMatcher(request -> !request.getRequestURI().startsWith("/api/"))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/").permitAll()
                         .requestMatchers("/shelves/**").authenticated()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .permitAll()
-                )
+                        .permitAll())
                 .logout(logout -> logout.permitAll());
 
         return http.build();
     }
 }
-
