@@ -3,6 +3,7 @@ package com.example.goodreads.controller.rest.user;
 import com.example.goodreads.dto.review.ReviewRequest;
 import com.example.goodreads.dto.review.ReviewResponse;
 import com.example.goodreads.service.user.ReviewService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -28,8 +29,8 @@ public class ReviewController {
     @PreAuthorize("isAuthenticated()")
     @PostMapping
     public ResponseEntity<ReviewResponse> addReview(Authentication authentication,
-                                                    @PathVariable Long bookId,
-                                                    @RequestBody ReviewRequest reviewRequest) {
+            @PathVariable Long bookId,
+            @Valid @RequestBody ReviewRequest reviewRequest) {
         String currentUsername = authentication.getName();
         ReviewResponse reviewResponse = reviewService.addReview(currentUsername, bookId, reviewRequest);
         return ResponseEntity.ok(reviewResponse);

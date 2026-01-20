@@ -6,6 +6,7 @@ import com.example.goodreads.dto.shelf.ShelfRequest;
 import com.example.goodreads.dto.shelf.ShelfResponse;
 import com.example.goodreads.exception.InvalidShelfActionException;
 import com.example.goodreads.service.user.ShelfService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -38,7 +39,8 @@ public class ShelfController {
     }
 
     @PostMapping
-    public ResponseEntity<ShelfResponse> addShelfToUser(Authentication authentication, @RequestBody ShelfRequest shelfRequest) {
+    public ResponseEntity<ShelfResponse> addShelfToUser(Authentication authentication,
+            @Valid @RequestBody ShelfRequest shelfRequest) {
         String username = authentication.getName();
         ShelfResponse shelfResponse = shelfService.addShelfToUser(username, shelfRequest);
         return ResponseEntity.created(URI.create("/api/shelves")).body(shelfResponse);
@@ -48,7 +50,7 @@ public class ShelfController {
     public ResponseEntity<ShelfResponse> updateShelf(
             Authentication authentication,
             @PathVariable Long shelfId,
-            @RequestBody ShelfRequest request) {
+            @Valid @RequestBody ShelfRequest request) {
 
         String username = authentication.getName();
         return ResponseEntity.ok(shelfService.updateUserShelf(username, shelfId, request));
@@ -65,7 +67,7 @@ public class ShelfController {
     public ResponseEntity<Void> shelfBookAction(
             Authentication authentication,
             @PathVariable Long fromShelfId,
-            @RequestBody ShelfActionRequest shelfActionRequest) {
+            @Valid @RequestBody ShelfActionRequest shelfActionRequest) {
         String username = authentication.getName();
         switch (shelfActionRequest.getAction()) {
             case ADD_BOOK -> shelfService.addBookToShelf(username, fromShelfId, shelfActionRequest.getBookId());

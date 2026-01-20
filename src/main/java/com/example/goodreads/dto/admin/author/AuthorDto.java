@@ -1,10 +1,16 @@
 package com.example.goodreads.dto.admin.author;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public class AuthorDto {
+    @NotNull(message = "Author ID is required")
     private Long id;
+    @NotBlank(message = "Author name is required")
     private String name;
 
-    public AuthorDto() {}
+    public AuthorDto() {
+    }
 
     public AuthorDto(Long id, String name) {
         this.id = id;

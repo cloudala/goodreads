@@ -1,9 +1,13 @@
 package com.example.goodreads.dto.shelf;
 
 import com.example.goodreads.model.ShelfAction;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 public class ShelfActionRequest {
+    @NotNull(message = "Book ID is required")
     private Long bookId;
+    @NotNull(message = "Shelf action is required")
     private ShelfAction action;
     private Long destinationShelfId;
 

@@ -2,6 +2,7 @@ package com.example.goodreads.controller.rest.admin;
 
 import com.example.goodreads.dto.admin.author.AuthorDto;
 import com.example.goodreads.service.admin.AdminAuthorService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,7 +32,7 @@ public class AdminAuthorController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> create(@RequestBody AuthorDto authorDto) {
+    public ResponseEntity<Void> create(@Valid @RequestBody AuthorDto authorDto) {
         adminAuthorService.createAuthor(authorDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -39,8 +40,7 @@ public class AdminAuthorController {
     @PutMapping("/{id}")
     public ResponseEntity<Void> update(
             @PathVariable Long id,
-            @RequestBody AuthorDto authorDto
-    ) {
+            @Valid @RequestBody AuthorDto authorDto) {
         adminAuthorService.updateAuthor(id, authorDto);
         return ResponseEntity.ok().build();
     }

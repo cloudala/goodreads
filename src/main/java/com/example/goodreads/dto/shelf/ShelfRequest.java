@@ -1,6 +1,9 @@
 package com.example.goodreads.dto.shelf;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class ShelfRequest {
+    @NotBlank(message = "Shelf name is required")
     private String name;
 
     public ShelfRequest() {

@@ -4,6 +4,7 @@ import com.example.goodreads.dto.admin.book.AdminBookResponse;
 import com.example.goodreads.dto.admin.book.AdminCreateBookRequest;
 import com.example.goodreads.dto.admin.book.AdminUpdateBookRequest;
 import com.example.goodreads.service.admin.AdminBookService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -31,12 +32,13 @@ public class AdminBookController {
     }
 
     @PostMapping
-    public ResponseEntity<AdminBookResponse> createBook(@RequestBody AdminCreateBookRequest request) {
+    public ResponseEntity<AdminBookResponse> createBook(@Valid @RequestBody AdminCreateBookRequest request) {
         return ResponseEntity.ok(adminBookService.createBook(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AdminBookResponse> updateBook(@PathVariable Long id, @RequestBody AdminUpdateBookRequest request) {
+    public ResponseEntity<AdminBookResponse> updateBook(@PathVariable Long id,
+            @Valid @RequestBody AdminUpdateBookRequest request) {
         return ResponseEntity.ok(adminBookService.updateBook(id, request));
     }
 

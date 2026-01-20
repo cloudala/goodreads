@@ -3,6 +3,7 @@ package com.example.goodreads.controller.rest.user;
 import com.example.goodreads.dto.user.UpdateUserRequest;
 import com.example.goodreads.dto.user.UpdateUserResponse;
 import com.example.goodreads.service.user.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -19,7 +20,8 @@ public class UserController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<UpdateUserResponse> updateUser(Authentication authentication, @RequestBody UpdateUserRequest updateUserRequest) {
+    public ResponseEntity<UpdateUserResponse> updateUser(Authentication authentication,
+            @Valid @RequestBody UpdateUserRequest updateUserRequest) {
         String currentUsername = authentication.getName();
         return ResponseEntity.ok(userService.updateOwnProfile(currentUsername, updateUserRequest));
     }
