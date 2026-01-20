@@ -2,7 +2,9 @@ package com.example.goodreads.service.user;
 
 import com.example.goodreads.dto.PaginatedResponse;
 import com.example.goodreads.dto.book.BookResponse;
+import com.example.goodreads.dto.book.BookStatsResponse;
 import com.example.goodreads.dto.book.BookWithReviewsResponse;
+import com.example.goodreads.dto.book.PopularBookResponse;
 import com.example.goodreads.dto.review.ReviewResponse;
 import com.example.goodreads.model.Author;
 import com.example.goodreads.model.Book;
@@ -15,7 +17,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -116,17 +121,36 @@ public class BookService {
         return new PaginatedResponse<>(content, results.getNumber(), results.getSize(), results.getTotalElements(), results.getTotalPages());
     }
 
-//    public List<BookResponse> getAllBooks() {
-//        List<Book> books = bookRepository.findAll();
-//        return books.stream()
-//                .map(b -> new BookResponse(b.getId(), b.getTitle(), b.getAuthor(), 0.0))
-//                .collect(Collectors.toList());
-//    }
+    public BookStatsResponse getBookStats(Long bookId) {
+        Object[] bookAndAvgRating = bookRepository.findBookByIdWithAverageRating(bookId)
+                .stream().findFirst().orElseThrow(() -> new RuntimeException("Book not found with id: " + bookId));
+        Double averageRating = (Double) bookAndAvgRating[1];
+        Long readerCount = bookRepository.countTotalReadersByBookId(bookId);
+        Map<Long, Long> reviewDistribution = getReviewDistribution(bookId);
+        return new BookStatsResponse(bookId, readerCount, reviewDistribution, averageRating);
+    }
 
-//    public List<BookResponse> searchBooks(String query) {
-//        List<Book> books = bookRepository.searchByTitleOrAuthorOrIsbn(query);
-//        return books.stream()
-//                .map(b -> new BookResponse(b.getId(), b.getTitle(), b.getAuthor(), 0.0))
-//                .collect(Collectors.toList());
-//    }
+    public Map<Long, Long> getReviewDistribution(Long bookId) {
+        List<Long[]> results = reviewRepository.getReviewDistributionByBookId(bookId);
+
+        // Initialize with all ratings (1-5) defaulting to 0
+        Map<Long, Long> distribution = new HashMap<>();
+        for (long i = 1; i <= 5; i++) {
+            distribution.put(i, 0L);
+        }
+
+        // Populate from query results
+        for (Long[] row : results) {
+            Long rating = (Long) row[0];
+            Long count = (Long) row[1];
+            distribution.put(rating, count);
+        }
+
+        return distribution;
+    }
+
+    public List<PopularBookResponse> getPopularBooks() {
+        List<PopularBookResponse> popularBooks = bookRepository.findTop10BooksByMostReadsAfterDate(LocalDateTime.now().minusMonths(1));
+        return popularBooks;
+    }
 }

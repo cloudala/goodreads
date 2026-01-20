@@ -2,8 +2,11 @@ package com.example.goodreads.service.user;
 
 import com.example.goodreads.dto.user.UpdateUserRequest;
 import com.example.goodreads.dto.user.UpdateUserResponse;
+import com.example.goodreads.dto.user.UserReadingStatsResponse;
 import com.example.goodreads.exception.UsernameNotFoundException;
+import com.example.goodreads.model.ShelfType;
 import com.example.goodreads.model.User;
+import com.example.goodreads.repository.ShelfRepository;
 import com.example.goodreads.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -12,10 +15,12 @@ import org.springframework.stereotype.Service;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ShelfRepository shelfRepository;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, ShelfRepository shelfRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.shelfRepository = shelfRepository;
     }
 
     public User getCurrentUser(String username) {
@@ -45,5 +50,20 @@ public class UserService {
     public void deleteOwnAccount(String username) {
         User user = getCurrentUser(username);
         userRepository.delete(user);
+    }
+
+    public UserReadingStatsResponse getUserReadingStats(String username) {
+        User user = getCurrentUser(username);
+        long totalBooksRead = shelfRepository.countTotalBooksByShelfTypeAndUserId(ShelfType.READ, user.getId());
+        long booksReadThisYear = shelfRepository.countBooksByShelfTypeAndDateAddedAfter(ShelfType.READ, user.getId(), java.time.LocalDate.now().withDayOfYear(1));
+        long booksReadThisMonth = shelfRepository.countBooksByShelfTypeAndDateAddedAfter(ShelfType.READ, user.getId(), java.time.LocalDate.now().withDayOfMonth(1));
+        long currentlyReading = shelfRepository.countTotalBooksByShelfTypeAndUserId(ShelfType.CURRENTLY_READING, user.getId());
+
+        return new UserReadingStatsResponse(
+            totalBooksRead,
+            booksReadThisYear,
+            booksReadThisMonth,
+            currentlyReading
+        );
     }
 }

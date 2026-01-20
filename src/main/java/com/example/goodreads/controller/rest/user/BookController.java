@@ -40,4 +40,9 @@ public class BookController {
         return ResponseEntity.ok(results);
     }
 
+    @GetMapping("/popular")
+    public ResponseEntity<List<PopularBookResponse>> getPopularBooks() {
+        List<PopularBookResponse> popularBooks = bookService.getPopularBooks();
+        return ResponseEntity.ok(popularBooks);
+    }
 }
