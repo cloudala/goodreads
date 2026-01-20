@@ -3,7 +3,7 @@ version: '3.8'
 services:
   db:
     image: postgres:15
-    container_name: goodreads_postgres
+    container_name: goodreads_postgres1
     restart: always
     environment:
       POSTGRES_DB: goodreads
@@ -13,6 +13,19 @@ services:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: goodreads_app
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/goodreads
+      SPRING_DATASOURCE_USERNAME: goodreads
+      SPRING_DATASOURCE_PASSWORD: secret
+    ports:
+      - "8080:8080"
 
 volumes:
   db_data:
