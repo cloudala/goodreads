@@ -26,7 +26,7 @@ public class ReviewController {
         return ResponseEntity.ok(reviews);
     }
 
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("isAuthenticated() && authentication.principal.isAccountNonLocked()")
     @PostMapping
     public ResponseEntity<ReviewResponse> addReview(Authentication authentication,
             @PathVariable Long bookId,

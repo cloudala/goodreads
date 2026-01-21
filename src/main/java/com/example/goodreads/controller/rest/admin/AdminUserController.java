@@ -49,4 +49,14 @@ public class AdminUserController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/{id}/lock")
+    public ResponseEntity<AdminUserResponse> lockUserAccount(@PathVariable Long id) {
+        return ResponseEntity.ok(adminUserService.lockUserAccount(id));
+    }
+
+    @PostMapping("/{id}/unlock")
+    public ResponseEntity<AdminUserResponse> unlockUserAccount(@PathVariable Long id) {
+        return ResponseEntity.ok(adminUserService.unlockUserAccount(id));
+    }
+
 }

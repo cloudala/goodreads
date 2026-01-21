@@ -34,7 +34,8 @@ public class AdminUserService {
                 user.getId(),
                 user.getUsername(),
                 user.getEmail(),
-                user.getRole()
+                user.getRole(),
+                user.isLocked()
         );
     }
 
@@ -90,5 +91,19 @@ public class AdminUserService {
     public void deleteUser(Long id) {
         User user = getUserByIdInternal(id);
         userRepository.delete(user);
+    }
+
+    public AdminUserResponse lockUserAccount(Long id) {
+        User user = getUserByIdInternal(id);
+        user.setLocked(true);
+        userRepository.save(user);
+        return mapToResponse(user);
+    }
+
+    public AdminUserResponse unlockUserAccount(Long id) {
+        User user = getUserByIdInternal(id);
+        user.setLocked(false);
+        userRepository.save(user);
+        return mapToResponse(user);
     }
 }

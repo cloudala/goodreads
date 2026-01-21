@@ -7,14 +7,16 @@ public class AdminUserResponse {
     private String username;
     private String email;
     private Role role;
+    private boolean isLocked;
 
     public AdminUserResponse() {}
 
-    public AdminUserResponse(Long id, String username, String email, Role role) {
+    public AdminUserResponse(Long id, String username, String email, Role role, boolean isLocked) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.role = role;
+        this.isLocked = isLocked;
     }
 
     public Long getId() {
@@ -47,5 +49,13 @@ public class AdminUserResponse {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public boolean isLocked() {
+        return isLocked;
+    }
+
+    public void setLocked(boolean locked) {
+        isLocked = locked;
     }
 }

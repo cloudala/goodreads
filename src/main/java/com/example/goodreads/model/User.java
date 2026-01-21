@@ -25,6 +25,9 @@ public class User {
     @Column(nullable = false)
     private Role role = Role.USER;
 
+    @Column(nullable = false)
+    private boolean isLocked = false;
+
     @OneToMany(
             mappedBy = "user",
             cascade = CascadeType.ALL,
@@ -46,6 +49,7 @@ public class User {
         this.username = username;
         this.email = email;
         this.password = password;
+        this.isLocked = false;
     }
 
     public User() {
@@ -105,6 +109,14 @@ public class User {
 
     public void setReviews(Set<Review> reviews) {
         this.reviews = reviews;
+    }
+
+    public boolean isLocked() {
+        return isLocked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.isLocked = locked;
     }
 
     // -------- Helper methods --------

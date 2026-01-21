@@ -38,6 +38,7 @@ public class ShelfController {
         return ResponseEntity.ok(shelfDetailsResponse);
     }
 
+    @PreAuthorize("authentication.principal.isAccountNonLocked()")
     @PostMapping
     public ResponseEntity<ShelfResponse> addShelfToUser(Authentication authentication,
             @Valid @RequestBody ShelfRequest shelfRequest) {
@@ -46,6 +47,7 @@ public class ShelfController {
         return ResponseEntity.created(URI.create("/api/shelves")).body(shelfResponse);
     }
 
+    @PreAuthorize("authentication.principal.isAccountNonLocked()")
     @PutMapping("/{shelfId}")
     public ResponseEntity<ShelfResponse> updateShelf(
             Authentication authentication,
@@ -56,6 +58,7 @@ public class ShelfController {
         return ResponseEntity.ok(shelfService.updateUserShelf(username, shelfId, request));
     }
 
+    @PreAuthorize("authentication.principal.isAccountNonLocked()")
     @DeleteMapping("/{shelfId}")
     public ResponseEntity<Void> deleteShelf(Authentication authentication, @PathVariable Long shelfId) {
         String username = authentication.getName();
@@ -63,6 +66,7 @@ public class ShelfController {
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("authentication.principal.isAccountNonLocked()")
     @PostMapping("/{fromShelfId}/books")
     public ResponseEntity<Void> shelfBookAction(
             Authentication authentication,
