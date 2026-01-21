@@ -13,14 +13,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -154,5 +154,60 @@ class AdminUserServiceTest {
         adminUserService.deleteUser(1L);
 
         verify(userRepository).delete(user);
+    }
+
+    // ---------- LOCK USER ACCOUNT ----------
+    @Test
+    void testLockUserAccountSuccessfully() {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        AdminUserResponse response = adminUserService.lockUserAccount(1L);
+
+        assertThat(response.isLocked()).isTrue();
+        assertThat(user.isLocked()).isTrue();
+
+        verify(userRepository).findById(1L);
+        verify(userRepository).save(user);
+    }
+
+    @Test
+    void testLockUserAccountUserNotFound() {
+        when(userRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> adminUserService.lockUserAccount(99L))
+                .isInstanceOf(UsernameNotFoundException.class)
+                .hasMessageContaining("User with id 99 not found");
+
+        verify(userRepository).findById(99L);
+        verify(userRepository, never()).save(any());
+    }
+
+    // ---------- UNLOCK USER ACCOUNT ----------
+    @Test
+    void testUnlockUserAccountSuccessfully() {
+        user.setLocked(true);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        AdminUserResponse response = adminUserService.unlockUserAccount(1L);
+
+        assertThat(response.isLocked()).isFalse();
+        assertThat(user.isLocked()).isFalse();
+
+        verify(userRepository).findById(1L);
+        verify(userRepository).save(user);
+    }
+
+    @Test
+    void testUnlockUserAccountUserNotFound() {
+        when(userRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> adminUserService.unlockUserAccount(99L))
+                .isInstanceOf(UsernameNotFoundException.class)
+                .hasMessageContaining("User with id 99 not found");
+
+        verify(userRepository).findById(99L);
+        verify(userRepository, never()).save(any());
     }
 }

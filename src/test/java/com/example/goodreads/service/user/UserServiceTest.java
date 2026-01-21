@@ -2,18 +2,21 @@ package com.example.goodreads.service.user;
 
 import com.example.goodreads.dto.user.UpdateUserRequest;
 import com.example.goodreads.dto.user.UpdateUserResponse;
+import com.example.goodreads.dto.user.UserReadingStatsResponse;
 import com.example.goodreads.exception.UsernameNotFoundException;
+import com.example.goodreads.model.ShelfType;
 import com.example.goodreads.model.User;
+import com.example.goodreads.repository.ShelfRepository;
 import com.example.goodreads.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -27,6 +30,9 @@ class UserServiceTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private ShelfRepository shelfRepository;
 
     @InjectMocks
     private UserService userService;
@@ -115,5 +121,29 @@ class UserServiceTest {
 
         verify(userRepository, times(1)).findByUsername("testuser");
         verify(userRepository, times(1)).delete(user);
+    }
+
+    @Test
+    void testGetUserReadingStats() {
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
+        when(shelfRepository.countTotalBooksByShelfTypeAndUserId(ShelfType.READ, 1L)).thenReturn(50L);
+        when(shelfRepository.countBooksByShelfTypeAndDateAddedAfter(eq(ShelfType.READ), eq(1L), any(LocalDate.class)))
+                .thenReturn(20L)
+                .thenReturn(5L);
+        when(shelfRepository.countTotalBooksByShelfTypeAndUserId(ShelfType.CURRENTLY_READING, 1L)).thenReturn(3L);
+
+        UserReadingStatsResponse response = userService.getUserReadingStats("testuser");
+
+        assertNotNull(response);
+        assertEquals(50L, response.getTotalBooksRead());
+        assertEquals(20L, response.getBooksReadThisYear());
+        assertEquals(5L, response.getBooksReadThisMonth());
+        assertEquals(3L, response.getCurrentlyReading());
+
+        verify(userRepository).findByUsername("testuser");
+        verify(shelfRepository).countTotalBooksByShelfTypeAndUserId(ShelfType.READ, 1L);
+        verify(shelfRepository, times(2)).countBooksByShelfTypeAndDateAddedAfter(eq(ShelfType.READ), eq(1L),
+                any(LocalDate.class));
+        verify(shelfRepository).countTotalBooksByShelfTypeAndUserId(ShelfType.CURRENTLY_READING, 1L);
     }
 }

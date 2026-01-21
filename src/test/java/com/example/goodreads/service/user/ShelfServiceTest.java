@@ -18,7 +18,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -62,7 +63,6 @@ class ShelfServiceTest {
         book.setAuthor(author);
     }
 
-
     // --------------------------------------------------
     // createDefaultShelves
     // --------------------------------------------------
@@ -102,7 +102,7 @@ class ShelfServiceTest {
         when(userService.getCurrentUser("testuser")).thenReturn(user);
         when(shelfRepository.findByIdAndUserId(1L, 1L)).thenReturn(Optional.of(shelf));
 
-        Object[] row = new Object[]{book, 4.5};
+        Object[] row = new Object[] { book, 4.5 };
         when(bookRepository.findBooksWithAverageRatingByShelfId(1L))
                 .thenReturn(List.<Object[]>of(row));
 
@@ -289,5 +289,109 @@ class ShelfServiceTest {
         verify(shelfRepository).save(shelf);
         verify(shelfRepository).save(toShelf);
     }
-}
 
+    @Test
+    void testMoveBookFromShelfToShelfSourceNotFound() {
+        when(userService.getCurrentUser("testuser")).thenReturn(user);
+        when(shelfRepository.findByIdAndUserId(1L, 1L)).thenReturn(Optional.empty());
+
+        assertThrows(ShelfNotFoundException.class,
+                () -> shelfService.moveBookFromShelfToShelf("testuser", 1L, 2L, 1L));
+
+        verify(userService).getCurrentUser("testuser");
+        verify(shelfRepository).findByIdAndUserId(1L, 1L);
+        verify(shelfRepository, never()).save(any());
+    }
+
+    @Test
+    void testMoveBookFromShelfToShelfDestinationNotFound() {
+        when(userService.getCurrentUser("testuser")).thenReturn(user);
+        when(shelfRepository.findByIdAndUserId(1L, 1L)).thenReturn(Optional.of(shelf));
+        when(shelfRepository.findByIdAndUserId(2L, 1L)).thenReturn(Optional.empty());
+
+        assertThrows(ShelfNotFoundException.class,
+                () -> shelfService.moveBookFromShelfToShelf("testuser", 1L, 2L, 1L));
+
+        verify(userService).getCurrentUser("testuser");
+        verify(shelfRepository).findByIdAndUserId(1L, 1L);
+        verify(shelfRepository).findByIdAndUserId(2L, 1L);
+        verify(shelfRepository, never()).save(any());
+    }
+
+    @Test
+    void testMoveBookFromShelfToShelfBookNotFound() {
+        Shelf toShelf = new Shelf("Other Shelf");
+        toShelf.setId(2L);
+        toShelf.setUser(user);
+        toShelf.setType(ShelfType.CUSTOM);
+
+        when(userService.getCurrentUser("testuser")).thenReturn(user);
+        when(shelfRepository.findByIdAndUserId(1L, 1L)).thenReturn(Optional.of(shelf));
+        when(shelfRepository.findByIdAndUserId(2L, 1L)).thenReturn(Optional.of(toShelf));
+        when(bookRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(BookNotFoundException.class,
+                () -> shelfService.moveBookFromShelfToShelf("testuser", 1L, 2L, 1L));
+
+        verify(userService).getCurrentUser("testuser");
+        verify(bookRepository).findById(1L);
+        verify(shelfRepository, never()).save(any());
+    }
+
+    @Test
+    void testRemoveBookFromShelfBookNotFound() {
+        when(userService.getCurrentUser("testuser")).thenReturn(user);
+        when(shelfRepository.findByIdAndUserId(1L, 1L)).thenReturn(Optional.of(shelf));
+        when(bookRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(BookNotFoundException.class,
+                () -> shelfService.removeBookFromShelf("testuser", 1L, 1L));
+
+        verify(userService).getCurrentUser("testuser");
+        verify(bookRepository).findById(1L);
+        verify(shelfRepository, never()).save(any());
+    }
+
+    @Test
+    void testAddBookToShelfShelfNotFound() {
+        when(userService.getCurrentUser("testuser")).thenReturn(user);
+        when(shelfRepository.findByIdAndUserId(1L, 1L)).thenReturn(Optional.empty());
+
+        assertThrows(ShelfNotFoundException.class,
+                () -> shelfService.addBookToShelf("testuser", 1L, 1L));
+
+        verify(userService).getCurrentUser("testuser");
+        verify(shelfRepository).findByIdAndUserId(1L, 1L);
+        verify(bookRepository, never()).findById(any());
+        verify(shelfRepository, never()).save(any());
+    }
+
+    @Test
+    void testUpdateUserShelfNotFound() {
+        ShelfRequest request = new ShelfRequest();
+        request.setName("Updated Shelf");
+
+        when(userService.getCurrentUser("testuser")).thenReturn(user);
+        when(shelfRepository.findByIdAndUserId(1L, 1L)).thenReturn(Optional.empty());
+
+        assertThrows(ShelfNotFoundException.class,
+                () -> shelfService.updateUserShelf("testuser", 1L, request));
+
+        verify(userService).getCurrentUser("testuser");
+        verify(shelfRepository).findByIdAndUserId(1L, 1L);
+        verify(shelfRepository, never()).save(any());
+    }
+
+    @Test
+    void testDeleteUserShelfNotFound() {
+        when(userService.getCurrentUser("testuser")).thenReturn(user);
+        when(shelfRepository.findByIdAndUserId(1L, 1L)).thenReturn(Optional.empty());
+
+        assertThrows(ShelfNotFoundException.class,
+                () -> shelfService.deleteUserShelf("testuser", 1L));
+
+        verify(userService).getCurrentUser("testuser");
+        verify(shelfRepository).findByIdAndUserId(1L, 1L);
+        verify(shelfRepository, never()).delete(any());
+    }
+}

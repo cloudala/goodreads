@@ -5,7 +5,6 @@ import com.example.goodreads.dto.admin.author.AuthorDto;
 import com.example.goodreads.exception.AuthorNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.util.List;
 import java.util.Optional;
